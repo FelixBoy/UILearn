@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="UILearn:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/UILearn_war_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="UILearn/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="UILearn" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
