@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<meta charset="UTF-8">
+<!-- 引入JQuery -->
+<script type="text/javascript" src="easyui1.4/jquery.min.js"></script>
+<!-- 引入EasyUI -->
+<script type="text/javascript" src="easyui1.4/jquery.easyui.min.js"></script>
+<!-- 引入EasyUI的中文国际化js，让EasyUI支持中文 -->
+<script type="text/javascript" src="easyui1.4/locale/easyui-lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="easyui1.4/mask.js"></script>
+
+<script type="text/javascript" src="easyui1.4/ex/jquery.portal.js"></script>
+
+<!-- 引入EasyUI的样式文件-->
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/bootstrap/easyui.css">
+<!-- 引入EasyUI的图标样式文件-->
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/icon.css">
+
+<link rel="stylesheet" type="text/css" href="easyui1.4/ex/portal.css">
+
+<script type="text/javascript">
+
+//要想渲染快，不出现原界面，js必须写在head里
+//通过onload来加载渲染
+
+$(function(){
+
+	//加上遮罩层  目标.mask  给目标模块加遮罩层
+	$("#p").mask({
+		maskMsg:"加载中...",
+		timeout:50000
+	}); 
+
+	$(function(){
+		$('#pp').portal({
+			border:false,
+			fit:true
+		});
+		add();
+	});
+
+	//撤销遮罩层
+	$("#p").mask("hide");  
+	$('#dlg').attr('display','block');
+	
+});
+
+
+function add(){
+	var names = {"0":"我的日程","1":"最新新闻","2":"公司快报"};
+	for(var i=0; i<3; i++){
+		var p = $('<div/>').appendTo('body');
+		p.panel({
+			title:names[i],
+			content:'<div style="padding:5px;">'+names[i]+'</div>',
+			height:100,
+			closable:true,
+			collapsible:true
+		});
+		$('#pp').portal('add', {
+			panel:p,
+			columnIndex:i
+		});
+	}
+	$('#pp').portal('resize');
+}
+
+function test(){
+
+	//var row = $('#tb').datagrid('getSelected');
+	var rows = $('#tb').datagrid('getChecked');
+	$("#dlg").dialog('open').dialog('setTitle','hello');
+	//$('#frm').form('load',row);
+
+	$('#frm').form('load',rows[1]);
+	/**
+	$('#frm').form('load',{
+		firstname:row.firstname,
+		lastname:row.lastname,
+		phone:row.phone,
+		email:row.email
+	});
+	
+	$("#frm").form('clear');
+	**/
+}
+
+
+</script>
+
+</HEAD>
+
+<BODY class="easyui-layout">
+
+<div region="center" border="false">
+	<!--  -->
+	<div id="pp" style="width:90%;height:90%;" style="position:relative">    
+		<div style="width:30%;">
+			<div title="Clock" style="text-align:center;background:#f3eeaf;height:150px;padding:5px;">
+				<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,29,0" width="100" height="100">
+				  <param name="movie" value="http://www.respectsoft.com/onlineclock/analog.swf">
+				  <param name=quality value=high>
+				  <param name="wmode" value="transparent">
+				  <embed src="http://www.respectsoft.com/onlineclock/analog.swf" width="100" height="100" quality=high pluginspage="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash" type="application/x-shockwave-flash" wmode="transparent"></embed>
+				</object>
+			</div>
+			<div title="最新公告" collapsible="true" closable="true" style="height:200px;padding:5px;">
+				<div class="t-list">创建边框布局</div>
+				<div class="t-list">创建复杂布局</div>
+				<div class="t-list">创建折叠面板</div>
+				<div class="t-list">创建标签页</div>
+				<div class="t-list">动态添加标签页</div>
+				<div class="t-list">添加自动播放标签页</div>
+				<div class="t-list">创建 XP 风格左侧面板</div>
+			</div>
+		</div>
+		<div style="width:40%;">
+			<div id="pgrid" title="未读消息" closable="true" style="height:200px;">
+				<table class="easyui-datagrid" style="width:650px;height:auto"
+						fit="true" border="false"
+						singleSelect="true"
+						idField="itemid" url="datagrid_data.json">
+					<thead>
+						<tr>
+							<th field="itemid" width="60">Item ID</th>
+							<th field="productid" width="60">Product ID</th>
+							<th field="listprice" width="80" align="right">List Price</th>
+							<th field="unitcost" width="80" align="right">Unit Cost</th>
+							<th field="attr1" width="120">Attribute</th>
+							<th field="status" width="50" align="center">Status</th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+		<div style="width:30%;">
+			<div title="Searching" iconCls="icon-search" closable="true" style="height:80px;padding:10px;">
+				<input class="easyui-searchbox">
+			</div>
+			<div title="Graph" closable="true" style="height:200px;text-align:center;">
+				<img height="160" src="#"></img>
+			</div>
+		</div>
+	</div>    
+</div>
+
+</BODY>
+</HTML>

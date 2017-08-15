@@ -1,0 +1,383 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE> New Document </TITLE>
+<meta charset="UTF-8">
+<!-- 引入JQuery -->
+<script type="text/javascript" src="easyui1.4/jquery.min.js"></script>
+<!-- 引入EasyUI -->
+<script type="text/javascript" src="easyui1.4/jquery.easyui.min.js"></script>
+<!-- 引入EasyUI的中文国际化js，让EasyUI支持中文 -->
+<script type="text/javascript" src="easyui1.4/locale/easyui-lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="easyui1.4/mask.js"></script>
+
+<!-- 引入EasyUI的样式文件-->
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/bootstrap/easyui.css">
+<!-- 引入EasyUI的图标样式文件-->
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/icon.css">
+
+<style type="text/css"> 
+#fm 
+{ 
+	margin: 0; 
+	padding: 10px 30px; 
+} 
+.ftitle 
+{ 
+	font-size: 14px; 
+	font-weight: bold; 
+	padding: 5px 0; 
+	margin-bottom: 10px; 
+	border-bottom: 1px solid #ccc; 
+} 
+.fitem 
+{ 
+	margin-bottom: 5px; 
+} 
+.fitem label 
+{ 
+	display: inline-block; 
+	width: 80px; 
+} 
+</style> 
+
+ 
+<script type="text/javascript">
+
+//要想渲染快，不出现原界面，js必须写在head里
+//通过onload来加载渲染
+
+$(function(){
+
+	//加上遮罩层  目标.mask  给目标模块加遮罩层
+	$("#p").mask({
+		maskMsg:"加载中...",
+		timeout:50000
+	}); 
+
+	$('#p').panel({      
+	  fit:true,
+	  border:true,
+	  title: ' ',
+	  loadingMessage:"loading...."
+	}); 
+
+	$("#pg").propertygrid({
+		title:"明细",
+		data:[],
+		showGroup:false,
+		scrollbarSize:0
+	});
+	
+	
+	$('#tb').datagrid({
+		title:"用户管理",
+		iconCls:"icon-man",
+		rownumbers:true,
+		singleSelect:true,
+		fitColumns:true,
+		toolbar:"#toolbar",
+		selectOnCheck:true,
+		url: "users.json",
+		pagination:true,
+		onClickRow:fillPropertyGrid
+	});
+
+	
+	$("#dlg").dialog({
+		resizable:false,
+		closed:true,
+		buttons:"#dlg-buttons",
+		iconCls:'icon-save'
+	});
+
+	//撤销遮罩层
+	$("#p").mask("hide");  
+	$('#dlg').attr('display','block');
+			
+});
+
+//填充table  通过url属性来触发
+function fillTable(){
+
+	$('#tb').datagrid({ 
+        url: "users.json"
+    });
+}
+
+
+//填充属性表格
+function fillPropertyGrid(index,row){
+
+	$('#pg').propertygrid("loadData",[]); //清空原有数据
+
+	//添加新数据
+	var rowx = {name:"id",value:row.id};
+	$('#pg').propertygrid('appendRow',rowx); 
+	rowx = {name:"姓名",value:row.name};
+	$('#pg').propertygrid('appendRow',rowx); 
+	rowx = {name:"年龄",value:row.age};
+	$('#pg').propertygrid('appendRow',rowx); 
+	rowx = {name:"手机",value:row.phone};
+	$('#pg').propertygrid('appendRow',rowx); 
+	rowx = {name:"邮箱",value:row.email};
+	$('#pg').propertygrid('appendRow',rowx); 
+}
+
+function test(){
+
+	//var row = $('#tb').datagrid('getSelected');
+	var rows = $('#tb').datagrid('getChecked');
+	$("#dlg").dialog('open').dialog('setTitle','hello');
+	//$('#frm').form('load',row);
+
+	$('#frm').form('load',rows[1]);
+	/**
+	$('#frm').form('load',{
+		firstname:row.firstname,
+		lastname:row.lastname,
+		phone:row.phone,
+		email:row.email
+	});
+	
+	$("#frm").form('clear');
+	**/
+}
+
+function newUser(){
+
+	//var row = $('#tb').datagrid('getSelected');
+	//var rows = $('#tb').datagrid('getChecked');
+	$("#dlg").dialog('open').dialog('setTitle','新增');
+	$("#frm").form('clear');
+	//$('#frm').form('load',row);
+	//$('#frm').form('load',rows[1]);
+	
+	document.getElementById("url").value="userAction!saveUser.action"
+	document.getElementById("tid").value=""
+}
+
+function editUser(){
+
+	var row = $('#tb').datagrid('getSelected');
+	if(!row){ $.messager.alert("提示信息", "请选择要操作的记录"); return;}
+	//var rows = $('#tb').datagrid('getChecked');
+	$("#dlg").dialog('open').dialog('setTitle','修改');
+	$('#frm').form('load',row);
+	//$('#frm').form('load',rows[1]);
+	
+	document.getElementById("url").value="userAction!saveUser.action"
+	document.getElementById("tid").value=row.id;
+}
+
+
+function operateUser(){
+
+	var url = document.getElementById("url").value;
+	var tid = document.getElementById("tid").value;
+	if(tid!=""){ url = url+"?id="+tid;}
+	/**
+	alert(url);
+	alert(tid);
+	if(tid!=""){ url = url+"?id="+tid; 					
+		$.messager.show({   // show error message  
+			title: 'Error',
+			msg: url
+		});}
+	**/
+	$("#frm").form("submit",{
+		url:url,
+		onSubmit:function(){
+			//防止重复提交
+			var isValid = $(this).form('validate');
+			var validatex = $(this).form("validate");
+			if(validatex){
+				if (isValid){
+					// 如果表单有效则显示遮罩层
+					return true;
+				}else{
+					$.messager.alert("提示信息", "重复提交");
+					return false;
+				}
+			}else{
+				//没通过校验
+				return false;
+			}
+			// 返回false终止表单提交
+		},
+		success:function(){
+			$.messager.alert("提示信息", "操作成功");
+			//隐藏遮罩层
+			
+			$("#dlg").dialog("close"); //关闭对话框
+			$("#tb").datagrid("reload"); //刷新表格
+		}
+	});
+}
+
+
+function deleteUser(){
+
+	var row = $('#tb').datagrid('getSelected');
+	if(!row){ $.messager.alert("提示信息", "请选择要操作的记录"); return;}
+	$.messager.confirm("确认对话框","确定要删除该用户吗？",function(result){
+		if(result){
+			//ok
+			row = $('#tb').datagrid('getSelected');
+			//这里是删除用户逻辑
+			$.post('destroy_user.php', { id: row.id }, function (result) {
+				if (result.success) {
+					$.messager.alert("提示信息", "操作成功");
+					$('#tb').datagrid('reload'); // reload the user data  
+				} else {
+					$.messager.show({   // show error message  
+						title: 'Error',
+						msg: result.errorMsg
+					});
+				}
+			});				
+		}
+	});
+}
+
+
+function dialogCacel(){
+
+	$("#dlg").dialog("close"); //关闭对话框
+}
+
+</script>
+
+</HEAD>
+
+<BODY>
+
+<!--  
+<div id="p" style="width:850px;height:650px;padding:10px;">    
+-->
+<div id="p" style="padding:10px;">  
+	<table id="tb" style="margin:20px">
+		<thead>
+		<tr>
+			<th field="cc" width="50" checkbox=true></th>
+			<th field="id" width="50" hidden=true>no</th>
+			<th field="name" width="50">姓名</th>
+			<th field="age" width="50">年龄</th>
+			<th field="phone" width="50">手机</th>
+			<th field="email" width="50">邮箱</th>
+		</tr>
+		</thead>
+		<!--
+		<tr>
+			<td></td>
+			<td>1</td>
+			<td>123a</td>
+			<td>456a</td>
+			<td>123456789a</td>
+			<td>a@163.com</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>2</td>
+			<td>123b</td>
+			<td>456b</td>
+			<td>123456789b</td>
+			<td>b@163.com</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>3</td>
+			<td>123c</td>
+			<td>456c</td>
+			<td>123456789c</td>
+			<td>c@163.com</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>4</td>
+			<td>123d</td>
+			<td>456d</td>
+			<td>123456789d</td>
+			<td>d@163.com</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>5</td>
+			<td>123e</td>
+			<td>456e</td>
+			<td>123456789e</td>
+			<td>e@163.com</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>6</td>
+			<td>123f</td>
+			<td>456f</td>
+			<td>123456789f</td>
+			<td>f@163.com</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>7</td>
+			<td>123g</td>
+			<td>456g</td>
+			<td>123456789g</td>
+			<td>g@163.com</td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>8</td>
+			<td>123h</td>
+			<td>456h</td>
+			<td>123456789h</td>
+			<td>h@163.com</td>
+		</tr>
+		-->
+	</table>
+	<br/>
+	<table id="pg" style="width:50%">
+
+	</table>
+</div>    
+ 
+<div id="toolbar">
+	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUser();">新增</a>
+	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUser()";>修改</a>
+	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteUser()";>删除</a>
+	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-print" plain="true" onclick="fillTable()";>打印</a>
+</div>
+
+<div id="dlg" style="width:400;height:320px;padding:10px 20px;">
+	<div class="ftitle">User Information</div>
+	<form action="" id="frm" method="post">
+		<div class="fitem">
+			<label>姓名:</label>
+			<input name="firstname" class="easyui-validatebox" required="true">
+		</div>
+		<div class="fitem">
+			<label>年龄:</label>
+			<input name="lastname" class="easyui-validatebox" required="true">
+		</div>
+		<div class="fitem">
+			<label>手机:</label>
+			<input name="phone">
+		</div>
+		<div class="fitem">
+			<label>邮箱:</label>
+			<input name="email" class="easyui-validatebox" validType="email">
+		</div>
+		<input type="hidden" name="tid" id="tid" value="" />
+		<input type="hidden" name="url" id="url" value="" />
+	</form>
+</div>
+
+
+<div id="dlg-buttons">
+	<a href="javascript:void(0);" class="easyui-linkbutton" onclick="operateUser()">Ok</a>
+	<a href="javascript:void(0);" class="easyui-linkbutton" onclick="dialogCacel()">Cancel</a>
+</div>
+
+
+</BODY>
+</HTML>

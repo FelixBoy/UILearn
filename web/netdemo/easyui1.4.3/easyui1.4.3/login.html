@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>后台管理系统</title>
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/icon.css">
+<script type="text/javascript" src="easyui1.4/jquery.min.js"></script>
+<script type="text/javascript" src="easyui1.4/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="easyui1.4/locale/easyui-lang-zh_CN.js"></script>
+
+<style type="text/css">
+	a{text-decoration:none;color:black;}
+	body{background-color:#DDD;}
+</style>
+
+<script>
+
+$(function(){
+	
+	$("#username").textbox({
+		prompt:"username",
+		iconCls:"icon-man",
+		iconAlign:"right",
+		required:true
+	});
+	
+	$("#pwd").textbox({
+		prompt:"password",
+		iconCls:"icon-lock",
+		iconAlign:"right",
+		required:true
+	});
+	
+	$.extend($.fn.validatebox.defaults.rules,{
+
+		codeCheck:{
+			validator:function(value,param){
+				return validateFun();
+			},
+			message:'验证码不正确'
+		}
+	});
+	
+	$("#ckcode").validatebox({
+		required:true,
+		delay:200,
+		validType:"codeCheck"
+	});
+});
+
+ function check_f(){
+	/**
+	 var name=document.login_f.username.value;
+	 var pwd=document.login_f.pwd.value;
+	 var code=document.login_f.ckcode.value;
+	**/ 
+	 var name = $("#username").val();
+	 var pwd = $("#pwd").val();
+	 var code = $("#ckcode").val();
+
+	 if(!name||!pwd||!code){alert('请如入完整信息！');return false;}
+	 document.login_f.submit();
+ }
+</script>
+
+<script language="javascript" type="text/javascript">  
+var code; //在全局 定义验证码   
+function createCode() {
+    code = "";
+    var codeLength = 6;//验证码的长度   
+    var checkCode = document.getElementById("checkCode");
+    var selectChar = new Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9,'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z');//所有候选组成验证码的字符，当然也可以用中文的   
+ 
+    for (var i = 0; i < codeLength; i++) {
+        var charIndex = Math.floor(Math.random() * 36);
+        code += selectChar[charIndex];
+    }
+    //alert(code);
+    if (checkCode) {
+        checkCode.className = "code";
+        checkCode.value = code;
+    }
+}
+ 
+function validateFun() {
+    var inputCode = document.getElementById("ckcode").value;
+    if (inputCode != code) {
+		return false;
+    } 
+	return true;
+}
+</script>
+
+</head>
+<body style="background-image: url(images/back.jpg);" onload=createCode()>
+<div style="margin:0 auto;width:800px;">
+<div id="win" class="easyui-window" minimizable="false" maximizable="false"  collapsible="false"  title="Login" style="width:350px;height:240px;">
+	<!--
+    <form action="main0.html" method="post" style="padding:10px 20px 10px 40px;" name="login_f">
+        <p>用户名: <input class="easyui-validatebox" type="text" id="n" name="name" required="true"/></p>
+        <p>密&nbsp;码: <input class="easyui-validatebox"  id="pwd" type="password" name="password" required="true"></p>
+        <p>验证码: <input class="easyui-validatebox" type="text" id="n" name="ckcode" required="true" style="width:80px;"/><img src="images/logo.gif" width="70" height="20"/></p>
+        <div style="padding:5px;text-align:center;">
+            <a href="#" class="easyui-linkbutton" icon="icon-ok" onclick="check_f()">登录</a>
+            <a href="#" class="easyui-linkbutton" icon="icon-cancel" onclick="document.login_f.reset()">重置</a>
+        </div>
+    </form>
+	-->
+	<form action="main.html" method="post" style="padding:10px 20px 10px 40px;" name="login_f">
+        <p>
+			用户名: <input id="username" name="username" type="text" />
+		</p>
+        <p>
+			密&nbsp;码: <input id="pwd" name="pwd" type="password" />
+		</p>
+        <p>
+			验证码: <input type="text" id="ckcode" name="ckcode" style="width:80px;" />
+			<!--
+			<img src="images/logo.gif" width="70" height="20"/>-->
+			<input type="text" onclick="createCode()" readonly="readonly" id="checkCode" class="unchanged" style="width: 80px" /><br />
+		</p>
+        <div style="padding:5px;margin:15px;text-align:center;" align="center">
+			<!---
+            <a href="#" class="easyui-linkbutton" icon="icon-ok" onclick="check_f()">登录</a>
+            <a href="#" class="easyui-linkbutton" icon="icon-cancel" onclick="document.login_f.reset()">重置</a>
+			-->
+			<a href="#" class="easyui-linkbutton" onclick="check_f()" style="width:80px;">登录</a>
+			<!---
+			&nbsp;
+            <a href="#" class="easyui-linkbutton" onclick="document.login_f.reset()">重置</a>
+			-->
+        </div>
+    </form>
+</div>
+</div>
+
+</body>
+</html>

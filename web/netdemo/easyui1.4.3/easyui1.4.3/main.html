@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css" href="easyui1.4/themes/icon.css">
+<script type="text/javascript" src="easyui1.4/jquery.min.js"></script>
+<script type="text/javascript" src="easyui1.4/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="easyui1.4/locale/easyui-lang-zh_CN.js"></script>
+
+<style type="text/css">
+
+.divbg {
+background:url(images/test2.jpg);
+}
+</style>
+
+<script type="text/javascript">
+
+/**
+	var menujson = [{"id":"0","text":"功能选择","state":"open","children":[
+		{"id":1,"text":"百度","state":"closed","attributes":{"url":"https://www.baidu.com/"}},
+		{"id":2,"text":"csdn","state":"closed","attributes":{"url":"http://www.csdn.net/"}},
+		{"id":3,"text":"鼠绘","state":"closed","attributes":{"url":"http://www.ishuhui.com/"}},
+		{"id":4,"text":"搜狐","state":"closed","attributes":{"url":"http://www.sohu.com/"}}]
+	}];
+	
+		var menujson = "[{\"id\":\"0\",\"text\":\"功能选择\",\"state\":\"open\",\"children\":["
+		+"{\"id\":1,\"text\":\"百度\",\"state\":\"closed\",\"attributes\":{\"url\":\"https://www.baidu.com/\"}},"
+		+"{\"id\":2,\"text\":\"csdn\",\"state\":\"closed\",\"attributes\":{\"url\":\"http://www.csdn.net/\"}},"
+		+"{\"id\":3,\"text\":\"鼠绘\",\"state\":\"closed\",\"attributes\":{\"url\":\"http://www.ishuhui.com/\"}},"
+		+"{\"id\":4,\"text\":\"搜狐\",\"state\":\"closed\",\"attributes\":{\"url\":\"http://www.sohu.com/\"}}]"
+	+"}]";
+	
+		var menujson = '[{"id":"0","text":"功能选择","state":"open"}]';
+**/
+
+	var menujson = '[{"id":"0","text":"功能选择","state":"open","children":['
+		+'{"id":1,"text":"百度","attributes":{"url":"https://www.baidu.com/"}},'
+		+'{"id":3,"text":"鼠绘","attributes":{"url":"http://www.ishuhui.com/"}},'
+		+'{"id":5,"text":"用户管理","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"组织架构","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"通讯录","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"系统管理/数据字典","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"邮件收发","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"我的流程","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"我的多媒体(视频音乐播放器)","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"知识文档管理","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"全文搜索(高亮)","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"员工论坛/社区","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"共享/员工私人云盘","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"音频/视频会议","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"员工用餐/用车","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"office预览","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"图表组件","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":5,"text":"接口管理(webservice)","attributes":{"url":"tableDemo.html"}},'
+		+'{"id":6,"text":"我的工作台","attributes":{"url":"myplace.html"}}'
+	+']}]';
+
+	var menus = eval('(' + menujson + ')');
+	//alert(menus[0].children[0].attributes.url);
+	
+$(function(){
+/**	**/
+	$("#menuTree").tree({
+		data:menus,
+		onClick:chooseMenuFun
+	});
+	
+	$("#tabs").tabs({
+		tools:[{iconCls:"icon-remove",handler:closeOthers}],
+		fit:true
+	});
+	$("#tabs").tabs("add",{
+		title:"欢迎",
+		content:"您已经登录"
+	});
+});
+
+function closeOthers(){
+
+	//获取当前选中的tab的标题(easyui)  真是麻烦的很，属性都封装在options里
+　　//var currTab =$$('#tabs').tabs('getSelected'); 
+	//console.info(currTab.panel('options').title);
+	
+	//注意：tabs数组，一旦关闭一个tab，tabs就会改变，下标向前移1
+	//所以正确做法是，一直获取tabs[0]即可
+
+	//关闭其他选项卡
+	var tabs = $("#tabs").tabs("tabs");
+	var selectTitle = $("#tabs").tabs("getSelected").panel("options").title;
+	var sum = tabs.length;
+	var index = 0;
+	for(var i=0; i<sum; i++){
+		if(tabs.length>0){
+			var tab = tabs[index];
+			if(tab.panel("options").closable){
+				if(tab.panel("options").title != selectTitle){
+					$("#tabs").tabs("close",tab.panel("options").title);
+				}else{
+					index++;
+				}	
+			}else{
+				index++;
+			}	
+		}			
+	}
+}
+
+function chooseMenuFun(node){
+	
+	//alert(node.text);
+	//alert(node.attributes.url);
+	addTabByUrl(node.text,node.attributes.url);
+	
+	//这里判断一下选项卡数量，若达到10个，则生成一个新的选项卡“关闭其他”
+	
+}
+
+
+function addTabByUrl(title,url){
+	if(!$("#tabs").tabs("exists",title)){
+		$("#tabs").tabs("add",{
+			title:title,
+			closable:true,
+			content:getFrameByUrl(url)
+		});
+	}else{
+		$("#tabs").tabs("select",title);
+	}
+}
+
+function getFrameByUrl(url){
+/**
+	if(url.indexOf("?")==-1){
+		url+="?random="+new Date().getTime();
+	}else{
+		url+="&random="+new Date().getTime();
+	}
+**/
+	var frame = '<iframe name="mainFrame" frameborder="0" style="width: 100%; height: 100%;" src="'+url+'" </iframe>';
+	return frame;
+}
+
+</script>
+</head>
+<body class="easyui-layout">
+		<!--
+	<div style="width:700px;height:100px;" region="north" class="divbg">
+
+		<input id="ss" class="easyui-searchbox" style="width:300px" 
+			data-options="searcher:function(){},prompt:'Please Input Value',menu:'#mm'" />
+		
+		<a href="" >修改密码</a> &nbsp;&nbsp;
+		<a href="" >安全退出</a>
+		<div id="mm" style="width:120px"> 
+			<div data-options="name:'all',iconCls:'icon-ok'">All News</div> 
+			<div data-options="name:'sports'">Sports News</div> 
+		</div> 
+		
+		<div style="width:700px;height:110px;" region="north" border="false">
+			<iframe name="testFrame" frameborder="0" style="width: 100%;height:100px;" scrolling="no" src="top.html"> </iframe>
+		</div>
+		-->
+	<div style="width:700px;height:98px;" region="north" border="false">
+		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td height="70" background="images/main_05.gif"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td height="24"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="270" height="24" background="images/main_03.gif">&nbsp;</td>
+            <td width="505" background="images/main_04.gif">&nbsp;</td>
+            <td>&nbsp;</td>
+            <td width="21"><img src="images/main_07.gif" width="21" height="24"></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td height="38"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="270" height="38" background="images/main_09_副本.jpg">&nbsp;</td>
+            <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td width="77%" height="25" valign="bottom"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td width="50" height="19"><div align="center"><img src="images/main_12.gif" width="49" height="19"></div></td>
+                    <td width="50"><div align="center"><img src="images/main_14.gif" width="48" height="19"></div></td>
+                    <td width="50"><div align="center"><img src="images/main_16.gif" width="48" height="19"></div></td>
+                    <td width="50"><div align="center"><img src="images/main_18.gif" width="48" height="19"></div></td>
+                    <td width="50"><div align="center"><img src="images/main_20.gif" width="48" height="19"></div></td>
+                    <td width="26"><div align="center"><img src="images/main_21.gif" width="26" height="19"></div></td>
+                    <td width="100"><div align="center"><img src="images/main_22.gif" width="98" height="19"></div></td>
+                    <td>&nbsp;</td>
+                  </tr>
+                </table></td>
+                <td width="220" valign="bottom"  nowrap="nowrap"><div align="right"><span class="STYLE1"><span class="STYLE2">■</span> 今天是：20087年5月12日 星期一</span></div></td>
+              </tr>
+            </table></td>
+            <td width="21"><img src="images/main_11.gif" width="21" height="38"></td>
+          </tr>
+        </table></td>
+      </tr>
+      <tr>
+        <td height="8" style=" line-height:8px;"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="270" background="images/main_29.gif" style=" line-height:8px;">&nbsp;</td>
+            <td width="505" background="images/main_30.gif" style=" line-height:8px;">&nbsp;</td>
+            <td style=" line-height:8px;">&nbsp;</td>
+            <td width="21" style=" line-height:8px;"><img src="images/main_31.gif" width="21" height="8"></td>
+          </tr>
+        </table></td>
+      </tr>
+    </table></td>
+  </tr>
+  <tr>
+    <td height="28" background="images/main_36.gif"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+      <tr>
+        <td width="177" height="28" background="images/main_32.gif"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="20%"  height="22">&nbsp;</td>
+            <td width="59%" valign="bottom"><div align="center" class="STYLE1">当前用户：Admin</div></td>
+            <td width="21%">&nbsp;</td>
+          </tr>
+        </table></td>
+        <td><table width="100%" border="0" cellspacing="0" cellpadding="0">
+          <tr>
+            <td width="65" height="28"><table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td height="23" valign="bottom"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+                  <tr> 
+                    <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"> <div align="center" class="STYLE3">业务中心</div></td>
+                  </tr>
+                </table></td>
+              </tr>
+            </table></td>
+            <td width="3"><img src="images/main_34.gif" width="3" height="28"></td>
+            <td width="63"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"><div align="center" class="STYLE3">系统管理</div></td>
+              </tr>
+            </table></td>
+            <td width="3"><img src="images/main_34.gif" width="3" height="28"></td>
+            <td width="63"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"><div align="center" class="STYLE3">通讯录</div></td>
+              </tr>
+            </table></td>
+            <td width="3"><img src="images/main_34.gif" width="3" height="28"></td>
+            <td width="63"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"><div align="center" class="STYLE3">数据管理</div></td>
+              </tr>
+            </table></td>
+            <td width="3"><img src="images/main_34.gif" width="3" height="28"></td>
+            <td width="63"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"><div align="center" class="STYLE3">统计报表</div></td>
+              </tr>
+            </table></td>
+            <td width="3"><img src="images/main_34.gif" width="3" height="28"></td>
+            <td width="63"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"><div align="center" class="STYLE3">业务管理</div></td>
+              </tr>
+            </table></td>
+            <td width="3"><img src="images/main_34.gif" width="3" height="28"></td>
+            <td width="63"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"><div align="center" class="STYLE3">系统配置</div></td>
+              </tr>
+            </table></td>
+            <td width="3"><img src="images/main_34.gif" width="3" height="28"></td>
+            <td width="63"><table width="58" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td height="20" style="cursor:hand" onMouseOver="this.style.backgroundImage='url(images/bg.gif)';this.style.borderStyle='solid';this.style.borderWidth='1';borderColor='#a6d0e7'; "onmouseout="this.style.backgroundImage='url()';this.style.borderStyle='none'"><div align="center" class="STYLE3">升级维护</div></td>
+              </tr>
+            </table></td>
+            <td>&nbsp;</td>
+          </tr>
+        </table></td>
+        <td width="21"><img src="images/main_37.gif" width="21" height="28"></td>
+      </tr>
+    </table></td>
+  </tr>
+</table>
+	</div>
+	<div style="width:200px;" region="west" data-options="title:'菜单栏',split:true">
+		<ul id="menuTree">
+		<!--
+			<li>
+				<span>功能选择</span>
+				<ul>
+					<li id="baidu"><span>百度</span></li>
+					<li id="csdn"><span>csdn</span></li>
+					<li id="shuhui"><span>鼠绘</span></li>
+					<li id="souhu"><span>搜狐</span></li>
+				</ul>
+			</li>
+		-->
+		</ul>
+	</div>
+	<div region="center" data-options="title:'功能区'">
+		<div id="tabs" style="height:100%">
+			
+		</div>
+	</div>
+	<div region="south" style="height:30px;">
+		<div style="height:100%;padding:5px;" align="center">
+			<span>By sea   Email:sea_wave2011@163.com</span>
+		</div>
+	</div>
+</body>
+</html>
